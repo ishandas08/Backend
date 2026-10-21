@@ -23,7 +23,7 @@ export async function POST(request:NextRequest){
         const validPassword=await bcryptjs.compare(password,user.password)
 
         if(!validPassword){
-            return NextResponse.json({error:"invalid passeord "},{status:400})
+            return NextResponse.json({error:"invalid password "},{status:400})
         }
 
         const tokenData ={
