@@ -18,34 +18,33 @@ export default function Signup() {
   const [buttonDisabled, setButtonDisabled] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
 
-  
-const onSignup = async () => {
-  try {
-    setLoading(true);
+  const onSignup = async () => {
+    try {
+      setLoading(true);
 
-    const response = await axios.post("/api/users/signup", user);
+      const response = await axios.post("/api/users/signup", user);
 
-    console.log("Signup API response:", response.status, response.data);
+      console.log("Signup API response:", response.status, response.data);
 
-    if (response.data.success) {
-      window.location.replace("/login");
-    } else {
-      toast.error(response.data.error || "Signup failed");
+      if (response.data.success) {
+        window.location.replace("/login");
+      } else {
+        toast.error(response.data.error || "Signup failed");
+      }
+    } catch (error: unknown) {
+      console.error("Signup failed:", error);
+
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.error || "Signup request failed"
+        );
+      } else {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
     }
-  } catch (error: unknown) {
-    console.error("Signup failed:", error);
-
-    if (axios.isAxiosError(error)) {
-      toast.error(
-        error.response?.data?.error || "Signup request failed"
-      );
-    } else {
-      toast.error("Something went wrong");
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     if (
@@ -60,59 +59,97 @@ const onSignup = async () => {
   }, [user]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1>{loading ? "Processing..." : "Signup"}</h1>
-      <hr />
+    <div className="flex flex-col items-center justify-center min-h-screen py-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
 
-      <label htmlFor="username">Username</label>
-      <input
-        className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
-        id="username"
-        type="text"
-        value={user.username}
-        onChange={(e) =>
-          setUser({ ...user, username: e.target.value })
-        }
-        placeholder="Username"
-      />
+      <div className="w-full max-w-md mx-4 p-8 bg-white rounded-2xl shadow-2xl">
 
-      <label htmlFor="email">Email</label>
-      <input
-        className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
-        id="email"
-        type="email"
-        value={user.email}
-        onChange={(e) =>
-          setUser({ ...user, email: e.target.value })
-        }
-        placeholder="Email"
-      />
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
+          {loading ? "Processing..." : "Create Account"}
+        </h1>
 
-      <label htmlFor="password">Password</label>
-      <input
-        className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
-        id="password"
-        type="password"
-        value={user.password}
-        onChange={(e) =>
-          setUser({ ...user, password: e.target.value })
-        }
-        placeholder="Password"
-      />
+        <p className="text-center text-gray-500 mb-8">
+          Sign up to get started
+        </p>
 
-      <button
-        onClick={onSignup}
-        disabled={buttonDisabled || loading}
-        className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 disabled:opacity-50"
-      >
-        {loading
-          ? "Processing..."
-          : buttonDisabled
-          ? "Enter details"
-          : "Signup"}
-      </button>
+        <hr className="mb-6 border-gray-200" />
 
-      <Link href="/login">Visit login page</Link>
+        <label
+          htmlFor="username"
+          className="block mb-2 text-sm font-semibold text-gray-700"
+        >
+          Username
+        </label>
+
+        <input
+          className="w-full p-3 border border-gray-300 rounded-lg mb-5 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+          id="username"
+          type="text"
+          value={user.username}
+          onChange={(e) =>
+            setUser({ ...user, username: e.target.value })
+          }
+          placeholder="Enter your username"
+        />
+
+        <label
+          htmlFor="email"
+          className="block mb-2 text-sm font-semibold text-gray-700"
+        >
+          Email Address
+        </label>
+
+        <input
+          className="w-full p-3 border border-gray-300 rounded-lg mb-5 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+          id="email"
+          type="email"
+          value={user.email}
+          onChange={(e) =>
+            setUser({ ...user, email: e.target.value })
+          }
+          placeholder="Enter your email"
+        />
+
+        <label
+          htmlFor="password"
+          className="block mb-2 text-sm font-semibold text-gray-700"
+        >
+          Password
+        </label>
+
+        <input
+          className="w-full p-3 border border-gray-300 rounded-lg mb-6 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+          id="password"
+          type="password"
+          value={user.password}
+          onChange={(e) =>
+            setUser({ ...user, password: e.target.value })
+          }
+          placeholder="Create a password"
+        />
+
+        <button
+          onClick={onSignup}
+          disabled={buttonDisabled || loading}
+          className="w-full p-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading
+            ? "Processing..."
+            : buttonDisabled
+            ? "Enter details"
+            : "Create Account"}
+        </button>
+
+        <p className="text-center text-sm text-gray-600 mt-6">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-indigo-600 font-semibold hover:text-purple-700 hover:underline transition"
+          >
+            Login
+          </Link>
+        </p>
+
+      </div>
     </div>
   );
 }
