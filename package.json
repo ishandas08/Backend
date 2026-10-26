@@ -14,7 +14,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.11.2",
     "next": "16.4.2",
-    "nodemailer": "^10.1.2",
+    "nodemailer": "^10.2.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-hot-toast": "^2.6.1"
