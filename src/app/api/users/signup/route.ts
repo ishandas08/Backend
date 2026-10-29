@@ -1,52 +1,65 @@
 import { connect } from "@/dbConfig/dbConfig";
-import User  from "@/models/userModel";
+import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
-import { error } from "console";
 import { sendEmail } from "@/helpers/mailer";
 
-connect();
+export async function POST(request: NextRequest) {
+    try {
+        await connect();
 
+        const reqBody = await request.json();
+        const { username, email, password } = reqBody;
 
-export  async function  POST(request:NextRequest){
-    try{
-        const reqBody=await request.json()
-        const {username,email,password}=reqBody
+        if (!username || !email || !password) {
+            return NextResponse.json(
+                { error: "Please provide username, email and password" },
+                { status: 400 }
+            );
+        }
 
-        console.log(reqBody);
-       const user= await User.findOne({email})
-       if(user){
-        return NextResponse.json({error:"user already exist"},{status:400})
-       }
+        const existingUser = await User.findOne({ email });
 
-       const salt=await bcryptjs.genSalt(10)
-       const hashedPassword =await  bcryptjs.hash(password,salt)
+        if (existingUser) {
+            return NextResponse.json(
+                { error: "User already exists" },
+                { status: 400 }
+            );
+        }
 
+        const hashedPassword = await bcryptjs.hash(password, 10);
 
-      const newUser= new User({
-        username,
-        email,
-        password:hashedPassword
-       })
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword
+        });
 
-       const saveduser=await newUser.save()
-       console.log(saveduser);
+        const savedUser = await newUser.save();
 
+        await sendEmail({
+            email,
+            emailType: "VERIFY",
+            userId: savedUser._id
+        });
 
-       await sendEmail({email,emailType:"VERIFY",userId:saveduser._id})
+        return NextResponse.json(
+            {
+                message: "User created successfully. Please verify your email.",
+                success: true
+            },
+            { status: 201 }
+        );
+    } catch (error: unknown) {
+        console.error("Signup error:", error);
 
-       return NextResponse.json({
-        message:"user created succesfully",
-        success:true,
-        saveduser
-        })
-    }
-    catch(error:any){
-        return NextResponse.json({error:error.message},
-            {status:500}
-        )
+        return NextResponse.json(
+            {
+                error: error instanceof Error
+                    ? error.message
+                    : "An unexpected error occurred"
+            },
+            { status: 500 }
+        );
     }
 }
-
-
-
